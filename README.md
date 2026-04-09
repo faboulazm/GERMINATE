@@ -56,12 +56,9 @@ Seeds must have same naming convention:
 seeds/{gene_name}_seeds.faa
 ```
 
-
-
-
 Each seed file should contain a small set of curated, representative protein sequences for that gene (5+ sequences). SEEDscraper can be used to automate extraction of reviewed sequences to your desktop.
 
-**Reference database** — Provide a protein database in FASTA format (e.g. RefSeq bacterial proteins):
+**Reference database**: Provide a protein database in FASTA format (e.g. RefSeq bacterial proteins):
 
 ```
 refseq/
