@@ -1,0 +1,10 @@
+name: hmm-pipeline
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.10
+  - hmmer
+  - seqkit
+  - biopython
+  - cd-hit
