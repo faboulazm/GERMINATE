@@ -1,6 +1,6 @@
 # GERMINATE 🌱
 
-A bash pipeline for building Hidden Markov Model (HMM) profiles from non-redundant protein seed sequences scrabed by SEEDscraper, searching them against a protein database, and producing non-redundant gene catalog automated across multiple genes.
+A bash pipeline for building Hidden Markov Model (HMM) profiles from non-redundant protein seed sequences scraped by SEEDscraper, searching them against a protein database, and producing non-redundant gene catalog automated across multiple genes.
 ---
 
 ## Overview
