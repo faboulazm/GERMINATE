@@ -39,7 +39,7 @@ Non-redundant gene catalog (.faa)
 ### Installation via conda (recommended)
 
 ```bash
-conda create -n germinate -c bioconda clustalo hmmer seqkit cd-hit
+conda env create -f environment.yml
 conda activate germinate
 ```
 
@@ -67,25 +67,25 @@ refseq/
 
 ### 2. Configure the pipeline
 
-Open `run_pipeline.sh` and edit the top-level variables to match your setup:
+Run from the repository root. Configure paths using environment variables (relative paths resolve from your current directory):
 
 ```bash
-SEED_DIR="seeds"                        # Directory containing seed .faa files
-DB="refseq/bacteria_proteins.faa"       # Path to reference protein database
-OUTDIR="results"                        # Output directory (created automatically)
-THREADS=4                               # CPU threads (or pass as argument: bash run_pipeline.sh 8)
+export SEED_DIR="seeds"                        # Directory containing seed .faa files
+export DB="refseq/bacteria_proteins.faa"       # Path to reference protein database
+export OUTDIR="results"                        # Output directory (created automatically)
+export THREADS=4                               # CPU threads (or pass as argument: bash src/GERMINATE.sh 8)
 ```
 
 ### 3. Run
 
 ```bash
-bash run_pipeline.sh
+bash src/GERMINATE.sh
 ```
 
 Or specify thread count directly:
 
 ```bash
-bash run_pipeline.sh 8
+bash src/GERMINATE.sh 8
 ```
 
 ---
@@ -102,6 +102,7 @@ For each gene, the following files are generated in `results/`:
 | `{gene}.out` | Full hmmsearch standard output |
 | `{gene}_hits.list` | Filtered list of hit accessions |
 | `{gene}_hits.faa` | FASTA sequences of all hits |
+| `{gene}_nr.faa.clstr` | CD-HIT cluster membership |
 | `{gene}_nr.faa` | **Final output:** non-redundant hits at 95% identity |
 
 ---
@@ -110,7 +111,7 @@ For each gene, the following files are generated in `results/`:
 
 | Parameter | Default | Description |
 |---|---|---|
-| E-value cutoff | `1e-100` | Stringent threshold for hmmsearch hits; adjust in script for less conserved genes |
+| E-value cutoff | `1e-100` | Stringent threshold for hmmsearch hits; override with the `EVALUE` environment variable |
 | CD-HIT identity | `0.95` | Sequence identity threshold for redundancy removal |
 | CD-HIT word size | `5` | Word size for CD-HIT clustering (5 recommended for ≥ 0.7 identity) |
 | Memory (CD-HIT) | `16000 MB` | Adjust based on available RAM |
@@ -118,16 +119,31 @@ For each gene, the following files are generated in `results/`:
 > **Note on E-value stringency:** The default cutoff of `1e-100` is intentionally strict, designed for highly conserved gene families (e.g. SCFA biosynthesis genes). 
 ---
 
-## Example
+## Execution and checks
 
-A small example dataset is provided in `seeds/example/` to verify your installation:
+Override the shared search/filter cutoff with, for example:
 
 ```bash
-# Test with example data
-SEED_DIR="seeds/example" bash run_pipeline.sh
+EVALUE=1e-50 OUTDIR=results_new bash src/GERMINATE.sh 8
 ```
 
-Expected output is in `results/example_expected/` for comparison.
+The pipeline stops on tool failures and rejects missing/empty inputs, missing tools,
+invalid thread counts, and invalid cutoffs. Existing output files are not overwritten;
+choose a fresh `OUTDIR` for reruns. Failed runs may leave partial files for inspection.
+A search with no passing hits produces empty hit FASTA, final FASTA, and cluster files
+and continues to the next gene. Input checks do not validate biological suitability
+or fully validate FASTA contents.
+
+Run workflow regression tests with Python 3 (only needed for these tests):
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Tests use temporary synthetic inputs and stub executables to check filtering,
+zero-hit behavior, failures, paths with spaces, and configuration. They do not run
+real alignment/search/clustering or establish biological accuracy. A curated,
+biologically validated example dataset is not included yet.
 
 ---
 
